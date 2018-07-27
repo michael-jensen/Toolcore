@@ -1,8 +1,9 @@
 ﻿using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Managers;
+using Sitecore.Diagnostics;
 using Sitecore.Publishing;
-using Sitecore.SecurityModel;
+using Sitecore.Security.Accounts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,8 +14,10 @@ namespace FortisCollections.Toolcore.Publish
 	{
 		public string Publish(IPublisherOptions options)
 		{
-			using (new SecurityDisabler())
+			using (new UserSwitcher(@"sitecore\admin", false))
 			{
+				Log.Info($"Publisher::Publish has been called and the user context is: [{Sitecore.Context.User.Name}]", this);
+
 				var publisherOptions = SetDefaults(options);
 				var sourceDatabase = Factory.GetDatabase(publisherOptions.SourceDatabaseName);
 				var languages = LanguageManager.GetLanguages(sourceDatabase).AsEnumerable();
